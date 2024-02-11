@@ -186,7 +186,7 @@ int point_print(FILE *pf, const void *p) {
 
    pp = (Point*)p;
 
-   ret = fprintf(stdout, "[(%d, %d): %c]", point_getX(pp), point_getY(pp), point_getSymbol(pp));
+   ret = fprintf(pf, "[(%d, %d): %c]", point_getX(pp), point_getY(pp), point_getSymbol(pp));
 
    return ret;
 
