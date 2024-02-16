@@ -1,11 +1,10 @@
-
 /**
- * @brief it defines the functions and structures of maze
- *
- * @file maze.c
- * @version 1
- * @authors Álvaro Leonardo & Diego Tabero
- */
+* @brief it defines the functions and structures of maze
+*
+* @file maze.c
+* @version 1
+* @authors Álvaro Leonardo & Diego Tabero
+*/
 
 #include "maze.h"
 #include "types.h"
@@ -20,16 +19,16 @@
 
 struct _Point
 { /*defines the point struct*/
-    int x, y;
-    char symbol;
-    bool visited; /*for DFS*/
+   int x, y;
+   char symbol;
+   bool visited; /*for DFS*/
 };
 
 struct _Maze
 {
-    int ncols, nrows;
-    Point *in, *out;
-    Point **map;
+   int ncols, nrows;
+   Point *in, *out;
+   Point **map;
 };
 
 /*Function implementation*/
@@ -37,352 +36,349 @@ struct _Maze
 Point *point_new(int x, int y, char symbol)
 {
 
-    Point *point = NULL;
+   Point *point = NULL;
 
-    point = (Point *)calloc(1, sizeof(Point));
+   point = (Point *)calloc(1, sizeof(Point));
 
-    if (point == NULL || x < 0 || y < 0)
-    {
-        return NULL;
-    }
+   if (point == NULL || x < 0 || y < 0)
+   {
+       return NULL;
+   }
 
-    if (symbol != IN && symbol != OUT && symbol != WALL && symbol != SPACE)
-    {
-        return NULL;
-    }
+   if (symbol != IN && symbol != OUT && symbol != WALL && symbol != SPACE)
+   {
+       return NULL;
+   }
 
-    point->x = x;
-    point->y = y;
-    point->symbol = symbol;
+   point->x = x;
+   point->y = y;
+   point->symbol = symbol;
 
-    return point;
+   return point;
 }
 
 void point_free(Point *p)
 {
 
-    free(p);
+   free(p);
 }
 
 int point_getX(const Point *p)
 {
 
-    if (!p)
-    {
-        return INT_MAX;
-    }
+   if (!p)
+   {
+       return INT_MAX;
+   }
 
-    return p->x;
+   return p->x;
 }
 
 int point_getY(const Point *p)
 {
 
-    if (!p)
-    {
-        return INT_MAX;
-    }
+   if (!p)
+   {
+       return INT_MAX;
+   }
 
-    return p->y;
+   return p->y;
 }
 
 char point_getSymbol(const Point *p)
 {
 
-    if (!p)
-    {
-        return ERRORCHAR;
-    }
+   if (!p)
+   {
+       return ERRORCHAR;
+   }
 
-    return p->symbol;
+   return p->symbol;
 }
 
 Status point_setX(Point *p, int x)
 {
 
-    if (!p || x < 0)
-    {
-        return ERROR;
-    }
+   if (!p || x < 0)
+   {
+       return ERROR;
+   }
 
-    p->x = x;
+   p->x = x;
 
-    return OK;
+   return OK;
 }
 
 Status point_setY(Point *p, int y)
 {
 
-    if (!p || y < 0)
-    {
-        return ERROR;
-    }
+   if (!p || y < 0)
+   {
+       return ERROR;
+   }
 
-    p->y = y;
+   p->y = y;
 
-    return OK;
+   return OK;
 }
 
 Status point_setSymbol(Point *p, char c)
 {
 
-    if (!p)
-    {
-        return ERROR;
-    }
+   if (!p)
+   {
+       return ERROR;
+   }
 
-    /*Cambiado error devolvia puntero a NULL--*/
+   /*Cambiado error devolvia puntero a NULL--*/
 
-    if (c != IN && c != OUT && c != WALL && c != SPACE)
-    {
-        return ERROR;
-    }
+   if (c != IN && c != OUT && c != WALL && c != SPACE)
+   {
+       return ERROR;
+   }
 
-    p->symbol = c;
+   p->symbol = c;
 
-    return OK;
+   return OK;
 }
 
 bool point_getVisited(const Point *p)
 {
 
-    if (!p)
-    {
-        return false;
-    }
+   if (!p)
+   {
+       return false;
+   }
 
-    return p->visited;
+   return p->visited;
 }
 
 Status point_setVisited(Point *p, bool bol)
 {
 
-    if (!p)
-    {
-        return ERROR;
-    }
+   if (!p)
+   {
+       return ERROR;
+   }
 
-    p->visited = bol;
+   p->visited = bol;
 
-    return OK;
+   return OK;
 }
 
 Point *point_hardcpy(const Point *src)
 {
 
-    Point *point = NULL;
+   Point *point = NULL;
 
-    point = point_new(src->x, src->y, src->symbol);
+   point = point_new(src->x, src->y, src->symbol);
 
-    return point;
+   return point;
 }
 
 bool point_equal(const void *p1, const void *p2)
 {
 
-    Point *p11 = NULL, *p22 = NULL;
+   Point *p11 = NULL, *p22 = NULL;
 
-    if (!p1 || !p2)
-    {
-        return false;
-    }
+   if (!p1 || !p2)
+   {
+       return false;
+   }
 
-    p11 = (Point *)p1;
-    p11 = (Point *)p1;
+   p11 = (Point *)p1;
+   p11 = (Point *)p1;
 
-    if (point_getX(p11) != point_getX(p22) || point_getY(p11) != point_getY(p22) || point_getSymbol(p11) != point_getSymbol(p22))
-    {
-        return false;
-    }
+   if (point_getX(p11) != point_getX(p22) || point_getY(p11) != point_getY(p22) || point_getSymbol(p11) != point_getSymbol(p22))
+   {
+       return false;
+   }
 
-    return true;
+   return true;
 }
 
 int point_print(FILE *pf, const void *p)
 {
 
-    Point *pp = NULL;
-    int ret;
+   Point *pp = NULL;
+   int ret;
 
-    if (!p || !pf)
-    {
-        return -1;
-    }
+   if (!p || !pf)
+   {
+       return -1;
+   }
 
-    pp = (Point *)p;
+   pp = (Point *)p;
 
-    ret = fprintf(pf, "[(%d, %d): %c]", point_getX(pp), point_getY(pp), point_getSymbol(pp));
+   ret = fprintf(pf, "[(%d, %d): %c]", point_getX(pp), point_getY(pp), point_getSymbol(pp));
 
-    return ret;
+   return ret;
 }
 
 /**
- * @brief  Creates a new empty Maze with nrows and ncols.
- *
- * Allocates memory for a new map and initializes it to be empty
- * (no points).
- *
- * @param nrows, ncols Dimension of the map
- *
- * @return A pointer to the graph if it was correctly allocated,
- * NULL otherwise.
- **/
+* @brief  Creates a new empty Maze with nrows and ncols.
+*
+* Allocates memory for a new map and initializes it to be empty
+* (no points).
+*
+* @param nrows, ncols Dimension of the map
+*
+* @return A pointer to the graph if it was correctly allocated,
+* NULL otherwise.
+**/
 
 Maze *maze_new(int nrows, int ncols)
 {
 
-    if(nrows<0 || ncols<0){
-        return NULL;
-    }
+   if(nrows<0 || ncols<0){
+       return NULL;
+   }
 
-    Maze *maze = NULL;
+   Maze *maze = NULL;
 
-    Point p;
+   Point p;
 
-    int i = 0, j = 0;
+   int i = 0, j = 0;
 
-    maze = (Maze *)calloc(1, sizeof(Maze));
+   maze = (Maze *)calloc(1, sizeof(Maze));
 
-    maze->nrows = nrows;
-    maze->ncols = ncols;
-    maze->in = &p;
-    maze->out = &p;
+   maze->nrows = nrows;
+   maze->ncols = ncols;
+   maze->in = &p;
+   maze->out = &p;
 
-    if (!maze)
-    {
-        return NULL;
-    }
+   if (!maze)
+   {
+       return NULL;
+   }
 
-    maze->map = (Point **)calloc(nrows, sizeof(Point *));
+   maze->map = (Point **)calloc(nrows, sizeof(Point *));
 
-    if (!maze->map)
-    {
-        maze_free(maze);
-        return NULL;
-    }
+   if (!maze->map)
+   {
+       maze_free(maze);
+       return NULL;
+   }
 
-    for (i = 0; i < nrows; i++)
-    {
-        maze->map[i] = (Point *)calloc(ncols, sizeof(Point));
-        if(!maze->map[i]){
-            maze_free(maze);
-            return NULL;
-        }
-    }
+   for (i = 0; i < nrows; i++)
+   {
+       maze->map[i] = (Point *)calloc(ncols, sizeof(Point));
+       if(!maze->map[i]){
+           maze_free(maze);
+           return NULL;
+       }
+   }
 
-    for (i = 0; i < nrows; i++)
-    {
-        for (j = 0; j < ncols; j++)
-        {
-            maze->map[i][j] = p;
-        }
-    }
+   for (i = 0; i < nrows; i++)
+   {
+       for (j = 0; j < ncols; j++)
+       {
+           point_setX(&maze->map[i][j],i);
+           point_setY(&maze->map[i][j],j);
+       }
+   }
 
-    return maze;
+   return maze;
 }
 
 /**
- * @brief Frees a maze.
- *
- * Frees all the memory allocated for the maze
- *
- * @param g Pointer to graph to be freed.
- **/
+* @brief Frees a maze.
+*
+* Frees all the memory allocated for the maze
+*
+* @param g Pointer to graph to be freed.
+**/
 
 void maze_free(Maze *maze)
 {
 
-    int i, j;
+   int i, j;
 
-    if(maze->in){
-        free(maze->in);
-    }
+   if(maze->in){
+       free(maze->in);
+   }
 
-    if(maze->out){
-        free(maze->out);
-    }
+   if(maze->out){
+       free(maze->out);
+   }
 
-    for (i = 0; i < maze->nrows; i++)
-    {
-        for (j = 0; j < maze->ncols; j++)
-        {
-            if (maze->map[i])
-            {
-                free(maze->map[i]);
-            }
-        }
-    }
+   for (i = 0; i < maze->nrows; i++)
+   {
+       for (j = 0; j < maze->ncols; j++)
+       {
+           if (maze->map[i])
+           {
+               free(maze->map[i]);
+           }
+       }
+   }
 
-    if (maze->map)
-    {
-        free(maze->map);
-    }
+   if (maze->map)
+   {
+       free(maze->map);
+   }
 
-    if (maze)
-    {
-        free(maze);
-    }
+   if (maze)
+   {
+       free(maze);
+   }
 }
 
 Status maze_setSymbol(const Maze *maze, int x, int y, char sym){
 
-    if (!maze)
-    {
-        return ERROR;
-    }
+   if (!maze)
+   {
+       return ERROR;
+   }
 
-    
+   
 
-    if (sym != IN && sym != OUT && sym != WALL && sym != SPACE)
-    {
-        return ERROR;
-    }
+   if (sym != IN && sym != OUT && sym != WALL && sym != SPACE)
+   {
+       return ERROR;
+   }
 
-    point_setSymbol(&maze->map[x][y], sym);
+   point_setSymbol(&maze->map[x][y], sym);
 
-    return OK;
+   return OK;
 
 }
 
 Status maze_setVisited(const Maze *maze, int x, int y, bool visited){
 
-    if (!maze)
-    {
-        return ERROR;
-    }
+   if (!maze)
+   {
+       return ERROR;
+   }
 
-    point_setVisited(&maze->map[x][y], visited);
+   point_setVisited(&maze->map[x][y], visited);
 
-    return OK;
+   return OK;
 
 }
 
 Point *maze_getPoint(const Maze *maze, int x, int y){
 
-    if(!maze){
-        return NULL;
-    }
+   if(!maze){
+       return NULL;
+   }
 
-    Point *point;
+   Point *point=&maze->map[x][y];
 
-    point=&maze->map[x][y];
-
-    return point;
+   return point;
 }
 
 char maze_getSymbol(const Maze *maze, int x, int y){
 
-    if(!maze){
-        return '\0';    
-    }
+   if(!maze){
+       return '\0';    
+   }
 
-    Point *point;
+   Point *point;
 
-    point=maze_getPoint(maze, x, y);
+   point=maze_getPoint(maze, x, y);
 
-    point->symbol;
-
-    return point->symbol;;
+   return point->symbol;;
 
 }
 
@@ -390,120 +386,122 @@ char maze_getSymbol(const Maze *maze, int x, int y){
 
 bool maze_isVisited(const Maze *maze, int x, int y){
 
-    if(!maze){
-        return false;
-    }
+   if(!maze){
+       return false;
+   }
 
-    Point *point;
+   Point *point;
 
-    point=maze_getPoint(maze,x,y);
+   point=maze_getPoint(maze,x,y);
 
-    return point_getVisited(point);
+   return point_getVisited(point);
 
 }
 
 Status maze_setIn(Maze *maze, int x, int y){
 
-    if(!maze){
-        return ERROR;
-    }
+   if(!maze){
+       return ERROR;
+   }
 
-    char sym=maze_getSymbol(maze, x, y);
+   maze->in=point_new(x,y,IN);
 
-    maze->in=point_new(x,y,sym);
+   return OK;
 
 
 }
 
 
-
-
 Status maze_setOut(Maze *maze, int x, int y){
 
-     if(!maze){
-        return ERROR;
-    }
+    if(!maze){
+       return ERROR;
+   }
 
-    char sym=maze_getSymbol(maze, x, y);
+   maze->out=point_new(x,y,OUT);
 
-    maze->out=point_new(x,y,sym);
+   return OK;
 
 }
 
 Point *maze_getNeighbor(const Maze *maze, const Point *p, direction dir){
 
-    Point *point;
+   Point *point;
 
-    if (!maze || !p) {
-        return NULL;
-    }
+   if (!maze || !p) {
+       return NULL;
+   }
 
-    if (dir == STAY) {
-        return p;
-    }
+   if (dir == STAY) {
+       return (Point*)p;
+   }
 
-    if (dir == RIGHT) {
+   if (dir == RIGHT) {
 
-        point = maze_getPoint(maze, p->x + 1, p->y);
+       point = maze_getPoint(maze, p->x + 1, p->y);
 
-        if (!(point)) {
-            return NULL;
-        }
+       if (!(point)) {
+           return NULL;
+       }
 
-        return point;
-    }
+       return point;
+   }
 
-    if (dir == UP) {
+   if (dir == UP) {
 
-        point = maze_getPoint(maze, p->x, p->y - 1);
+       point = maze_getPoint(maze, p->x, p->y - 1);
 
-        if (!(point)) {
-            return NULL;
-        }
+       if (!(point)) {
+           return NULL;
+       }
 
-        return point;
-    }
+       return point;
+   }
 
-    if (dir == LEFT) {
-        
-        point = maze_getPoint(maze, p->x - 1, p->y);
+   if (dir == LEFT) {
+       
+       point = maze_getPoint(maze, p->x - 1, p->y);
 
-        if (!(point)) {
-            return NULL;
-        }
+       if (!(point)) {
+           return NULL;
+       }
 
-        return point;
-    }
+       return point;
+   }
 
-    if (dir == DOWN) {
-        
-        point = maze_getPoint(maze, p->x, p->y + 1);
+   if (dir == DOWN) {
+       
+       point = maze_getPoint(maze, p->x, p->y + 1);
 
-        if (!(point)) {
-            return NULL;
-        }
+       if (!(point)) {
+           return NULL;
+       }
 
-        return point;
-    }
+       return point;
+   }
 
-    return NULL;
-  
+   return NULL;
+ 
 }
 
 /* check whether coordinates are valid for maze */
 Status maze_checkCoordinates(const Maze *maze, int x, int y){
 
-    if(x>maze->nrows || y>maze->ncols || x<0 || y<0 ){
-        return ERROR;
-    }
+   if(x>maze->nrows || y>maze->ncols || x<0 || y<0 ){
+       return ERROR;
+   }
 
-    return OK;
+   return OK;
 
 }
 
 int maze_getNrows(const Maze *maze){return maze->nrows;}
 
 int maze_getNcols(const Maze *maze){return maze->ncols;}
+
+Point *maze_getIn(const Maze *maze){return maze->in;}
+
+Point *maze_getOut(const Maze *maze){return maze->out;}
 
 int maze_printPoints(FILE *fp, const Maze *maze){
 
@@ -515,71 +513,85 @@ fprintf(fp, "Maze points: %d rows %d cols", maze->nrows, maze->ncols);
 
 
 for(x=0; x<maze->nrows; x++){
-    for(y=0 ; y<maze->ncols; y++, ret++){
-        point=maze_getPoint(maze->map,x,y); 
-        if(point_print(stdout,  (void *)point)<0)
-        {
+   for(y=0 ; y<maze->ncols; y++, ret++){
+       point=maze_getPoint(maze,x,y); 
+       if(point_print(stdout,  (void *)point)<0)
+       {
 
-            return -1;
+           return -1;
 
-        }
+       }
 
 
-    }
+   }
 
 }
-    return ret;
+   return ret;
 
 }
 
 /* START [maze_print] */
 /**
- * @brief Prints a maze in .
- *
- */
+* @brief Prints a maze in .
+*
+*/
 
 int maze_print(FILE *fp, const Maze *maze) {
+
+   if(!maze){
+       return -1;
+   }
+
+
 
 int x, y, ret;
 char sym;
 
 fprintf(fp, "Maze : %d rows %d cols", maze->nrows, maze->ncols);
 
+point_print(fp, maze->in);
+point_print(fp, maze->out);
+
 for(x=0; x<maze->nrows; x++){
-    for(y=0 ; y<maze->ncols; y++, ret++){
-        sym=maze_getSymbol(maze,x,y); 
-        fprintf(fp, "%c");
-    }
-    fprintf(fp, "\n");
+   for(y=0 ; y<maze->ncols; y++, ret++){
+       sym=maze_getSymbol(maze,x,y); 
+       fprintf(fp, "%c", sym);
+   }
+   fprintf(fp, "\n");
+
+   return ret;
 
 }
+
+   return OK;
 
 
 }
 
 /* START [maze_readFromFile] */
 /**
- * @brief Reads a map definition from a text file.
- *
- * Reads a maze description from the text file filename and returns the maze,
- * This function allocates memory for the maze
- *
- * The file contains a header with the map number of rows and cols.
- * The next file lines corresponds with the points of the map.
- *.
- * For example the file:
- *
- * 3 4
- * ++++
- * +io+
- * ++++
- *
- * Represents a map with 3 rows, 4 columns and the points:
- * [(0, 0): +][(0, 1): +][(0, 2): +][(0, 3): +][(1, 0): +][(1, 1): i]
- * [(1, 2): o][(1, 3): +][(2, 0): +][(2, 1): +][(2, 2): +][(2, 3): +]
- *
- * @param filename, name of text file
- *
- * @return the newly allocated maze or NULL if there is any error
- */
+* @brief Reads a map definition from a text file.
+*
+* Reads a maze description from the text file filename and returns the maze,
+* This function allocates memory for the maze
+*
+* The file contains a header with the map number of rows and cols.
+* The next file lines corresponds with the points of the map.
+*.
+* For example the file:
+*
+* 3 4
+* ++++
+* +io+
+* ++++
+*
+* Represents a map with 3 rows, 4 columns and the points:
+* [(0, 0): +][(0, 1): +][(0, 2): +][(0, 3): +][(1, 0): +][(1, 1): i]
+* [(1, 2): o][(1, 3): +][(2, 0): +][(2, 1): +][(2, 2): +][(2, 3): +]
+*
+* @param filename, name of text file
+*
+* @return the newly allocated maze or NULL if there is any error
+*/
 Maze *maze_readFromFile(const char *filename);
+
