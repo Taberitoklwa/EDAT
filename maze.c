@@ -236,16 +236,14 @@ Maze *maze_new(int nrows, int ncols)
 
    Maze *maze = NULL;
 
-   Point p;
-
    int i = 0, j = 0;
 
    maze = (Maze *)calloc(1, sizeof(Maze));
 
    maze->nrows = nrows;
    maze->ncols = ncols;
-   maze->in = &p;
-   maze->out = &p;
+   maze->in = NULL;
+   maze->out = NULL;
 
    if (!maze)
    {
@@ -438,7 +436,7 @@ Point *maze_getNeighbor(const Maze *maze, const Point *p, direction dir){
 
    if (dir == RIGHT) {
 
-       point = maze_getPoint(maze, p->x + 1, p->y);
+       point = maze_getPoint(maze, p->x, p->y + 1);
 
        if (!(point)) {
            return NULL;
@@ -449,7 +447,7 @@ Point *maze_getNeighbor(const Maze *maze, const Point *p, direction dir){
 
    if (dir == UP) {
 
-       point = maze_getPoint(maze, p->x, p->y - 1);
+       point = maze_getPoint(maze, p->x - 1, p->y);
 
        if (!(point)) {
            return NULL;
@@ -460,7 +458,7 @@ Point *maze_getNeighbor(const Maze *maze, const Point *p, direction dir){
 
    if (dir == LEFT) {
        
-       point = maze_getPoint(maze, p->x - 1, p->y);
+       point = maze_getPoint(maze, p->x, p->y - 1);
 
        if (!(point)) {
            return NULL;
@@ -471,7 +469,7 @@ Point *maze_getNeighbor(const Maze *maze, const Point *p, direction dir){
 
    if (dir == DOWN) {
        
-       point = maze_getPoint(maze, p->x, p->y + 1);
+       point = maze_getPoint(maze, p->x + 1, p->y);
 
        if (!(point)) {
            return NULL;
@@ -509,7 +507,7 @@ Point *point;
 
 int x,y, ret=0;
 
-fprintf(fp, "Maze points: %d rows %d cols", maze->nrows, maze->ncols);
+fprintf(fp, "Maze points: %d rows %d cols\n", maze->nrows, maze->ncols);
 
 
 for(x=0; x<maze->nrows; x++){
@@ -542,28 +540,27 @@ int maze_print(FILE *fp, const Maze *maze) {
        return -1;
    }
 
-
-
 int x, y, ret;
 char sym;
 
-fprintf(fp, "Maze : %d rows %d cols", maze->nrows, maze->ncols);
+fprintf(fp, "\nMaze : %d rows %d cols ", maze->nrows, maze->ncols);
 
 point_print(fp, maze->in);
 point_print(fp, maze->out);
 
+fprintf(fp, "\n");
+
 for(x=0; x<maze->nrows; x++){
-   for(y=0 ; y<maze->ncols; y++, ret++){
-       sym=maze_getSymbol(maze,x,y); 
+   for(y=0; y<maze->ncols; y++, ret++){
+       sym = maze_getSymbol(maze,x,y); 
        fprintf(fp, "%c", sym);
    }
-   fprintf(fp, "\n");
 
-   return ret;
+   fprintf(fp, "\n");
 
 }
 
-   return OK;
+   return ret;
 
 
 }

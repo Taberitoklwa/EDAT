@@ -26,4 +26,5 @@ p1_e2.o: p1_e2.c maze.h
 #################################################
 
 clean: 
+	@echo "Cleaning objects..."
 	@rm -f maze.o p1_e1.o p1_e1 p1_e2.o p1_e2
