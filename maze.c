@@ -187,7 +187,7 @@ bool point_equal(const void *p1, const void *p2)
    }
 
    p11 = (Point *)p1;
-   p11 = (Point *)p1;
+   p22 = (Point *)p2;
 
    if (point_getX(p11) != point_getX(p22) || point_getY(p11) != point_getY(p22) || point_getSymbol(p11) != point_getSymbol(p22))
    {
@@ -596,7 +596,7 @@ point_print(fp, maze->out);
 fprintf(fp, "\n");
 
 for(x=0; x<maze->nrows; x++){
-   for(y=0 ; y<maze->ncols; y++, ret++){
+   for(y=0 ,ret=0; y<maze->ncols; y++, ret++){
        sym=maze_getSymbol(maze,x,y); 
        fprintf(fp, "%c", sym);
    }
@@ -636,5 +636,58 @@ for(x=0; x<maze->nrows; x++){
 *
 * @return the newly allocated maze or NULL if there is any error
 */
-Maze *maze_readFromFile(const char *filename);
+Maze *maze_readFromFile(const char *filename){
+
+    int rows, cols, i, j;
+
+    char sym;
+
+    Maze *maze;
+
+    FILE * fmaze;
+
+
+
+    if(filename==NULL){
+        return NULL;
+    }
+
+    fmaze=fopen(filename, "r");
+
+    if(fmaze==NULL){
+        return NULL;
+    }
+
+    fscanf(fmaze, "%d %d", &rows, &cols);
+
+    maze=maze_new(rows, cols);
+
+    for (i = 0; i < rows; i++)
+   {
+       for (j = 0; j < cols; j++)
+       {
+        fscanf(fmaze, "%c", &sym);
+        if(sym=='\n'){
+            fscanf(fmaze, "%c", &sym);
+        }
+
+        if(sym==IN){
+            maze_setIn(maze, i, j);
+        }
+
+        if(sym==OUT){
+            maze_setOut(maze, i, j);
+        }
+
+        maze_setSymbol(maze, i, j, sym);
+       }
+   }
+
+
+
+    fclose(fmaze);
+
+    return maze;
+
+}
 

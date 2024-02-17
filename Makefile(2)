@@ -1,0 +1,21 @@
+CFLAGS = -Wall -g -pedantic
+SRC = maze.c
+HDR = maze.h types.h
+
+
+all: p1_e1 p1_e2 p1_e3
+
+#####################################
+
+p1_e1: $(SRC) $(HDR) p1_e1.c
+	gcc $(CFLAGS) -o p1_e1 p1_e1.c $(SRC)
+
+p1_e2: $(SRC) $(HDR) p1_e2.c
+	gcc $(CFLAGS) -o p1_e2 p1_e2.c $(SRC)
+
+p1_e3: $(SRC) $(HDR) p1_e3.c
+	gcc $(CFLAGS) -o p1_e3 p1_e3.c $(SRC)
+
+
+clean:
+rm p1_e1 p1_e2 p1_e3
