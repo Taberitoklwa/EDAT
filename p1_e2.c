@@ -7,7 +7,9 @@ int main() {
 
     int i;
 
-    Point *output, *aux;
+    direction dir;
+
+    Point *output;
 
     Maze *maze;
 
@@ -24,24 +26,28 @@ int main() {
 
     for (i=0; i<N_ROWS; i++) {
         if(maze_setSymbol(maze, i, 0, WALL)==ERROR) {
+            maze_free (maze);
             return ERROR;
         }
     }
 
     for (i=1; i<N_COLS; i++) {
         if(maze_setSymbol(maze, 0, i, WALL)==ERROR) {
+            maze_free (maze);
             return ERROR;
         }
     }
 
     for (i=1; i<N_COLS; i++) {
         if(maze_setSymbol(maze, N_ROWS - 1, i, WALL)==ERROR) {
+            maze_free (maze);
             return ERROR;
         }
     }
 
     for (i=1; i<N_ROWS - 1; i++) {
         if(maze_setSymbol(maze, i, N_COLS - 1, WALL)==ERROR) {
+            maze_free (maze);
             return ERROR;
         }
     }
@@ -49,22 +55,26 @@ int main() {
     /*Entrada*/
 
     if(maze_setSymbol(maze, 0, 2, IN)==ERROR){
+        maze_free (maze);
         return ERROR;
     }
 
     /*Salida*/
 
     if(maze_setSymbol(maze, 3, 3, OUT)==ERROR){
+        maze_free (maze);
         return ERROR;
     }
 
     /*Inicializacion entrada y salida*/ 
 
     if (maze_setIn(maze, 0, 2)==ERROR) {
+        maze_free (maze);
         return ERROR;
     }
 
     if (maze_setOut(maze, 3, 3)==ERROR) {
+        maze_free (maze);
         return ERROR;
     }
     
@@ -72,19 +82,22 @@ int main() {
     output = maze_getOut(maze);
 
     if (output == NULL) {
+        maze_free (maze);
         return ERROR;
     }
 
 
     /*Imprimir puntos*/
 
-    if(maze_printPoints(stdout, maze)==-1){
+    if(maze_printPoints(stdout, maze)==ERROR){
+        maze_free (maze);
         return ERROR;
     }
 
     /*Imprimir laberinto*/
 
-    if(maze_print(stdout, maze)==-1) {
+    if(maze_print(stdout, maze)==ERROR) {
+        maze_free (maze);
         return ERROR;
     }
 
@@ -92,25 +105,12 @@ int main() {
 
     fprintf(stdout,"Get output neighbors:\n");
 
-    aux = maze_getNeighbor(maze, output, UP);
-
-    point_print(stdout, aux);
-    
-    aux = maze_getNeighbor(maze, output, RIGHT);
-
-        point_print(stdout, aux);
-
-    aux = maze_getNeighbor(maze, output, LEFT);
-
-        point_print(stdout, aux);
-
-    aux = maze_getNeighbor(maze, output, DOWN);
-
-        point_print(stdout, aux);
+    for(dir=0; dir<=STAY; dir++){
+        (point_print(stdout, (void*)maze_getNeighbor(maze, output, dir)));
+    }
 
 
     maze_free(maze);
 
-    return 0;
-
+    return OK;
 }

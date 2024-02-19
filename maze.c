@@ -59,8 +59,9 @@ Point *point_new(int x, int y, char symbol)
 
 void point_free(Point *p)
 {
-
-   free(p);
+    if(p){
+        free(p);
+    }
 }
 
 int point_getX(const Point *p)
@@ -129,8 +130,6 @@ Status point_setSymbol(Point *p, char c)
    {
        return ERROR;
    }
-
-   /*Cambiado error devolvia puntero a NULL--*/
 
    if (c != IN && c != OUT && c != WALL && c != SPACE)
    {
@@ -205,7 +204,7 @@ int point_print(FILE *pf, const void *p)
 
    if (!p || !pf)
    {
-       return ERROR;
+       return -1;
    }
 
    pp = (Point *)p;
@@ -293,7 +292,7 @@ Maze *maze_new(int nrows, int ncols)
 void maze_free(Maze *maze)
 {
 
-   int i, j;
+   int i;
 
    if(maze->in){
        free(maze->in);
@@ -307,14 +306,12 @@ void maze_free(Maze *maze)
 
    for (i = 0; i < maze->nrows; i++)
    {
-       for (j = 0; j < maze->ncols; j++)
-       {
-           if (maze->map[i])
-           {
-               free(maze->map[i]);
-               maze->map[i]=NULL;
-           }
-       }
+        if (maze->map[i])
+        {
+            free(maze->map[i]);
+            maze->map[i]=NULL;
+        }
+       
    }
 
    if (maze->map)
@@ -447,7 +444,7 @@ Point *maze_getOut(const Maze *maze){
 
 Point *maze_getNeighbor(const Maze *maze, const Point *p, direction dir){
 
-   Point *point;
+   Point *point=NULL;
 
    if (!maze || !p) {
        return NULL;
@@ -590,14 +587,20 @@ char sym;
 
 fprintf(fp, "\nMaze : %d rows %d cols\n", maze->nrows, maze->ncols);
 
-point_print(fp, maze->in);
-point_print(fp, maze->out);
+if(point_print(fp, maze->in)<0){
+    return ERROR;
+}
+if(point_print(fp, maze->out)<0){
+    return ERROR;
+}
 
 fprintf(fp, "\n");
 
 for(x=0; x<maze->nrows; x++){
    for(y=0 ,ret=0; y<maze->ncols; y++, ret++){
-       sym=maze_getSymbol(maze,x,y); 
+       if(!(sym=maze_getSymbol(maze,x,y))){
+            return ERROR;
+       }
        fprintf(fp, "%c", sym);
    }
    fprintf(fp, "\n");
@@ -660,7 +663,9 @@ Maze *maze_readFromFile(const char *filename){
 
     fscanf(fmaze, "%d %d", &rows, &cols);
 
-    maze=maze_new(rows, cols);
+    if(!(maze=maze_new(rows, cols))){
+        return NULL;
+    }
 
     for (i = 0; i < rows; i++)
    {
@@ -682,8 +687,6 @@ Maze *maze_readFromFile(const char *filename){
         maze_setSymbol(maze, i, j, sym);
        }
    }
-
-
 
     fclose(fmaze);
 
