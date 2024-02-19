@@ -110,12 +110,16 @@ int main() {
 
         aux = maze_getNeighbor(maze, output, i);
 
-        if(aux==NULL) {
+        if (maze_checkCoordinates(maze, point_getX(aux), point_getY(aux))==ERROR) {
+
             break;
-        }
+
+        } else {
 
         point_print(stdout, aux);
 
-    }
+        }
 
+    }
 }
+
