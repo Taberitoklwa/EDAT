@@ -7,12 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define ERRORCHAR 'E'
-#define IN 'i'
-#define OUT 'o'
-#define WALL '+'
-#define SPACE '.'
-
 /*************************************************************************
  *
  *  Types
@@ -27,21 +21,21 @@ typedef struct _Point Point;
 typedef struct _Maze Maze;
 /* END [_Point] */
 
+/* legal symbols for points */
 #define ERRORCHAR 'E'
 #define IN 'i'
 #define OUT 'o'
-#define BARRIER '+'
+#define WALL '+'
 #define SPACE '.'
 
+/* enum for neighbors/directions */
 typedef enum {
   RIGHT = 0,
   UP = 1,
   LEFT = 2,
   DOWN = 3,
-  STAY = 4
+  STAY = 4,
 } direction;
-
-/*Quitada una coma del final*/
 
 /*************************************************************************
  *
@@ -58,7 +52,7 @@ typedef enum {
  * @code
  * // Example of use
  * Point * v;
- * v = point_new (0, 0, BARRIER);
+ * v = point_new (0, 0, WALL);
  * @endcode
  *
  * @param x Point x coordinate
@@ -66,7 +60,7 @@ typedef enum {
  * @param symbol Point symbol
  *
  * @return Return the initialized point if it was done correctly,
- * otherwise return NULL. A point is valid if its coordinates are greater than
+ * otherwise return NULL. A point is valid if its coordinates are non-negative
  * zero and its symbol is allowed.
  * Allowed symbols are: WALL, IN, OUT or SPACE
  */
@@ -104,7 +98,7 @@ int point_getY(const Point *p);
  *
  * @param Point pointer
  *
- * @return Returns the x coordinate of a given point, or ERRORCHAR in
+ * @return Returns the x coordinate of a given point, or ERROR in
  * case of error.
  */
 char point_getSymbol(const Point *p);
@@ -139,8 +133,8 @@ Status point_setY(Point *p, int y);
  */
 Status point_setSymbol(Point *p, char c);
 
-bool point_getVisited(const Point *p);       /*DFS (P2)*/ 
-Status point_setVisited(Point *p, bool bol);  /*DFS (P2)*/ 
+bool point_getVisited(const Point *p);       // DFS (P2)
+Status point_setVisited(Point *p, bool bol); // DFS (P2)
 
 /**
  * @brief Reserves memory for a point where it copies the data from
@@ -192,7 +186,7 @@ bool point_equal(const void *p1, const void *p2);
  * @return Returns the number of characters that have been written
  * successfully. If there have been errors returns -1.
  */
-int point_print(FILE *pf, const void *p); /*Print Stack*/ 
+int point_print(FILE *pf, const void *p); // Print Stack
 
 /*************************************************************************
  *
@@ -203,15 +197,17 @@ int point_print(FILE *pf, const void *p); /*Print Stack*/
 /**
  * @brief  Creates a new empty Maze with nrows and ncols.
  *
- * Allocates memory for a new map and initializes it to be empty
- * (no points).
+ * Allocates memory for a new maze and initializes it:
+ * - sets ncols and nrows
+ * - dynamically allocates a bidimensional array of nrows x ncols for the mao.
+ * - initializes all the points in the map with their coordinates, the
+ *   SPACE symbol, and visited=false
  *
- * @param nrows, ncols Dimension of the map
+ * @param nrows, ncols Dimensions of the maze's map
  *
- * @return A pointer to the graph if it was correctly allocated,
+ * @return A pointer to the maze if it was correctly allocated,
  * NULL otherwise.
  **/
-
 Maze *maze_new(int nrows, int ncols);
 
 /**
@@ -219,38 +215,79 @@ Maze *maze_new(int nrows, int ncols);
  *
  * Frees all the memory allocated for the maze
  *
- * @param g Pointer to graph to be freed.
+ * @param g Pointer to maze to be freed.
  **/
-
 void maze_free(Maze *maze);
 
-Status maze_setSymbol(const Maze *maze, int x, int y, char sym);
-
-Status maze_setVisited(const Maze *maze, int x, int y, bool visited);
-
-Point *maze_getPoint(const Maze *maze, int x, int y);
-
-char maze_getSymbol(const Maze *maze, int x, int y);
-
-bool maze_isVisited(const Maze *maze, int x, int y);
-
+/**
+ * @brief Functions to get and set the entry and exit points of the maze,
+ * columns and rows
+ */
 Status maze_setIn(Maze *maze, int x, int y);
 Status maze_setOut(Maze *maze, int x, int y);
-
-/* check whether coordinates are valid for maze */
-Status maze_checkCoordinates(const Maze *maze, int x, int y);
-
+Point *maze_getIn(const Maze *maze);
+Point *maze_getOut(const Maze *maze);
 int maze_getNrows(const Maze *maze);
 int maze_getNcols(const Maze *maze);
 
+/**
+ * @brief Obtains the neighbor of Point *p in the maze in direction dir
+ *
+ * @param maze
+ * @param p
+ * @param dir
+ * @return Point*
+ */
+Point *maze_getNeighbor(const Maze *maze, const Point *p, direction dir);
+
+/* check whether coordinates x and y are valid for maze */
+Status maze_checkCoordinates(const Maze *maze, int x, int y);
+
+/**
+ * Functions to operate on maze points (self-explanatory)
+ **/
+Status maze_setSymbol(const Maze *maze, int x, int y, char sym);
+Status maze_setVisited(const Maze *maze, int x, int y, bool visited);
+Point *maze_getPoint(const Maze *maze, int x, int y);
+char maze_getSymbol(const Maze *maze, int x, int y);
+bool maze_isVisited(const Maze *maze, int x, int y);
+
+/**
+ * @brief prints the points of a maze's map by calling print_point for
+ * every point
+ *
+ * @param fp
+ * @param maze
+ * @return int, the number of bytes printed
+ *
+ * For example, the map
+ * ++++
+ * +io+
+ * ++++
+ * is printed as
+ * [(0, 0): +][(0, 1): +][(0, 2): +][(0, 3): +][(1, 0): +][(1, 1): i]
+ * [(1, 2): o][(1, 3): +][(2, 0): +][(2, 1): +][(2, 2): +][(2, 3): +]
+ */
 int maze_printPoints(FILE *fp, const Maze *maze);
 
 /* START [maze_print] */
 /**
- * @brief Prints a maze in .
+ * @brief prints a graphical representation a maze's map, similar
+ * to the one processed by maze_ReadFromFile
  *
- */
-
+ * @param fp
+ * @param maze
+ * @return int the number of bytes printed
+ *
+ * Sample output:
+Reading maze from laberinto_1.txt
+Maze: 4 rows 5 cols
+[(1, 3): i][(2, 1): o]
++++++
++..i+
++o..+
++++++
+*/
 int maze_print(FILE *fp, const Maze *maze);
 
 /* START [maze_readFromFile] */

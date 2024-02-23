@@ -1,128 +1,174 @@
 
-
 #include "maze.h"
 
+#define NPOINTS 4
 
-void freepointers(Point *point[]){
+int main()
+{
 
-    int i;
+    int i = 0;
 
-    for(i=0; i<3; i++){
-        if(point[i])
-            free(point[i]); 
+    Point *point[NPOINTS];
+
+    for(i=0; i<NPOINTS; i++){
+        point[i]=NULL;
     }
-}
 
-int main(){
+    /*The free loop checks if the pointer points to NULL, and if not, frees the reserved memory*/
 
-int i=0;
-
-
-Point *point[4];
-
-for(i=0; i<3; i++){
-    point[i]=NULL;
-}
-
-point[0] = point_new(0, 0, WALL);
-
-point[1] = point_new(0, 1, WALL);
-
-if(point_print(stdout, point[0])<0){
-    freepointers(point);
-    return -1;
-}
-
-if(point_print(stdout, point[1])<0){
-    freepointers(point);
-    return -1;
-}
-
-
-fprintf(stdout, "\n¿Equal points p[0] and p[1]?");
-
-if(point_equal(point[0], point[1]) == true){
-
-fprintf(stdout,"NO");
-
-}
-else{
-
-fprintf(stdout,"YES");
-
-}
-
-
-fprintf(stdout, "\nCreating p[2]:");
-
-point[2]=point_hardcpy(point[0]);
-
-if (point_print(stdout, point[2])<0){
-    freepointers(point);
-    return -1;
-}
-
-fprintf(stdout, "\n¿Equal points p[0] and p[2]?");
-
-if(point_equal(point[0], point[2]) == true){
-
-fprintf(stdout,"NO");
-
-}
-else{
-
-fprintf(stdout,"YES");
-
-}
-
-fprintf(stdout, "\nModifying p[2]:");
-
-point_setSymbol(point[2], SPACE);
-
-if(point_print(stdout, point[2])<0){
-    freepointers(point);
-    return -1;
-}
-
-fprintf(stdout, "\n¿Equal points p[0] and p[2]?");
-
-if(point_equal(point[0], point[2]) == true){
-
-fprintf(stdout,"NO");
-
-}
-else{
-
-fprintf(stdout,"YES");
-
-}
-
-fprintf(stdout, "\nAssign p[3] = p[0]");
-
-point[3]=point[1];
-
-fprintf(stdout, "\nModifying p[3]\n");
-
-
-point_setSymbol(point[3], OUT);
-
-if(point_print(stdout, point[3])<0){
-    freepointers(point);
-    return -1;
-}
-
-for(i=0; i<3; i++){
-    if(point_print(stdout, point[i])<0){
-        freepointers(point);
-        return -1;
+    if(!(point[0] = point_new(0, 0, WALL))){
+        fprintf(stdout, "ERROR\n");
+        for(i=0; i<NPOINTS; i++){
+            point_free(point[i]);
+        }
+        return ERROR;
+    }
     
+
+    if(!(point[1] = point_new(0, 1, WALL))){
+        fprintf(stdout, "ERROR\n");
+        for(i=0; i<NPOINTS; i++){
+            point_free(point[i]);
+        }
+        return ERROR;
     }
+
+    if(point_print(stdout, point[0])<0){
+        fprintf(stdout, "ERROR\n");
+        for(i=0; i<NPOINTS; i++){
+            point_free(point[i]);
+        }
+        return ERROR;
+    }
+
+    if(point_print(stdout, point[1])<0){
+        fprintf(stdout, "ERROR\n");
+        for(i=0; i<NPOINTS; i++){
+            point_free(point[i]);
+        }
+        return ERROR;
+    }
+
+    fprintf(stdout, "\n¿Equal points p[0] and p[1]?");
+
+    if (point_equal(point[0], point[1]) == true)
+    {
+
+        fprintf(stdout, "Yes");
+    }
+    else
+    {
+
+        fprintf(stdout, "No");
+    }
+
+    fprintf(stdout, "\nCreating p[2]:");
+
+    if(!(point[2]=point_hardcpy(point[0]))){
+        fprintf(stdout, "ERROR\n");
+        for(i=0; i<NPOINTS; i++){
+            point_free(point[i]);
+        }
+        return ERROR;
+    }
+
+    if(point_print(stdout, point[2])<0){
+        fprintf(stdout, "ERROR\n");
+        for(i=0; i<NPOINTS; i++){
+            point_free(point[i]);
+        }
+        return ERROR;
+    }
+
+    fprintf(stdout, "\n¿Equal points p[0] and p[2]?");
+
+    if (point_equal(point[0], point[2]) == true)
+    {
+
+        fprintf(stdout, "Yes");
+    }
+    else
+    {
+
+        fprintf(stdout, "No");
+    }
+
+    fprintf(stdout, "\nModifying p[2]:");
+
+    if(!(point_setSymbol(point[2], SPACE))){
+        fprintf(stdout, "ERROR\n");
+        for(i=0; i<NPOINTS; i++){
+            point_free(point[i]);
+        }
+        return ERROR;
+    }
+
+    if(point_print(stdout, point[2])<0){
+        fprintf(stdout, "ERROR\n");
+        for(i=0; i<NPOINTS; i++){
+            point_free(point[i]);
+        }
+        return ERROR;
+    }
+
+
+    fprintf(stdout, "\n¿Equal points p[0] and p[2]?");
+
+    if (point_equal(point[0], point[2]) == true)
+    {
+
+        fprintf(stdout, "Yes ");
+    }
+    else
+    {
+
+        fprintf(stdout, "No");
+    }
+
+    fprintf(stdout, "\nAssign p[3] = p[0]");
+
+    point[3] = point[0];
+
+    fprintf(stdout, "\nModifying p[3]:");
+
+    /*The free loop iterates to position Npoint-1 since we have already freed point[0] and we don't have to free point[3] because point[3] is assigned to point[0].*/
+
+    if(!point_setSymbol(point[3], OUT)){
+        fprintf(stdout, "ERROR\n");
+        for(i=0; i<NPOINTS-1; i++){
+            point_free(point[i]);
+        }
+        return ERROR;
+    }
+
+    if(point_print(stdout, point[3])<0){
+        fprintf(stdout, "ERROR\n");
+        for(i=0; i<NPOINTS-1; i++){
+            point_free(point[i]);
+
+        }
+        return ERROR;
+    }
+
+    fprintf(stdout, "\n");
+
+    for(i=0; i<NPOINTS; i++){
+        if(point_print(stdout, point[i])<0){
+            fprintf(stdout, "ERROR\n");
+            for(i=0; i<NPOINTS-1; i++){
+                point_free(point[i]);
+            }
+            return ERROR;
+        }
+    }    
+
+    fprintf(stdout, "\n");
+
+    for (i = 0; i < NPOINTS; i++)
+    {
+        point_free(point[i]);
+        point[i]=NULL;
+    }
+
+    return OK;
 }
-
-freepointers(point);
-return 0;
-
-}
-
-
-
